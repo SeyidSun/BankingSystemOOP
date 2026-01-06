@@ -9,6 +9,9 @@ public class Main {
         System.out.println("   BANKA OTOMASYON SİSTEMİ (v1.0)");
         System.out.println("=========================================");
         
+        // Program başlarken kaydedilmiş verileri yükle
+        bank.loadData();
+        
         boolean exit = false;
         while (!exit) {
             System.out.println("\n--- ANA MENÜ ---");
@@ -21,6 +24,8 @@ public class Main {
             System.out.println("7. Faiz Hesapla (Vadeli Hesap)");
             System.out.println("8. Aylık Rapor Görüntüle");
             System.out.println("9. Kredi İşlemleri");
+            System.out.println("10. Kayıtlı Hesapları Görüntüle");
+            System.out.println("11. Hesap Sil");
             System.out.println("0. Çıkış");
             System.out.print("Seçiminiz: ");
 
@@ -36,9 +41,13 @@ public class Main {
                 case "7": calculateInterest(); break;
                 case "8": showMonthlyReport(); break;
                 case "9": creditOperations(); break;
+                case "10": listAllAccounts(); break;
+                case "11": deleteAccount(); break;
                 case "0": 
                     exit = true; 
-                    System.out.println("Çıkış yapılıyor. İyi günler!"); 
+                    // Program kapanırken verileri kaydet
+                    bank.saveData();
+                    System.out.println("Veriler kaydedildi. Çıkış yapılıyor. İyi günler!"); 
                     break;
                 default: System.out.println("Hata: Geçersiz seçim!");
             }
@@ -82,6 +91,7 @@ public class Main {
             System.out.print("Yatırılacak Tutar: ");
             double amount = Double.parseDouble(scanner.nextLine());
             acc.deposit(amount);
+            bank.saveData(); // Para yatırdıktan sonra kaydet
         } else {
             System.out.println(">> HATA: Böyle bir hesap bulunamadı!");
         }
@@ -96,6 +106,7 @@ public class Main {
             System.out.print("Çekilecek Tutar: ");
             double amount = Double.parseDouble(scanner.nextLine());
             acc.withdraw(amount);
+            bank.saveData(); // Para çektikten sonra kaydet
         } else {
             System.out.println(">> HATA: Böyle bir hesap bulunamadı!");
         }
@@ -115,6 +126,7 @@ public class Main {
                 System.out.print("Gönderilecek Tutar: ");
                 double amount = Double.parseDouble(scanner.nextLine());
                 fromAcc.transfer(toAcc, amount);
+                bank.saveData(); // Transfer sonrası kaydet
             } else {
                 System.out.println(">> Alıcı hesap bulunamadı!");
             }
@@ -156,6 +168,7 @@ public class Main {
             SavingsAccount savings = (SavingsAccount) acc;
             System.out.println("Faiz Oranı: " + (savings.getInterestRate() * 100) + "%");
             savings.calculateInterest();
+            bank.saveData(); // Faiz hesaplandıktan sonra kaydet
         } else {
             System.out.println(">> HATA: Hesap bulunamadı veya vadeli hesap değil!");
         }
@@ -187,6 +200,7 @@ public class Main {
             
             System.out.println("\n--- KREDİ İŞLEMLERİ ---");
             System.out.println("1. Kredi Başvurusu");
+
             System.out.println("2. Kredi Onayla");
             System.out.println("3. Kredi Ödemesi");
             System.out.println("4. Kredileri Listele");
@@ -202,11 +216,13 @@ public class Main {
                     System.out.print("Faiz Oranı (örn: 0.15): ");
                     double rate = Double.parseDouble(scanner.nextLine());
                     checking.applyForCredit(amount, term, rate);
+                    bank.saveData(); // Kredi başvurusu sonrası kaydet
                     break;
                 case "2":
                     System.out.print("Kredi ID: ");
                     String creditId = scanner.nextLine();
                     checking.approveCredit(creditId);
+                    bank.saveData(); // Kredi onayı sonrası kaydet
                     break;
                 case "3":
                     System.out.print("Kredi ID: ");
@@ -214,6 +230,7 @@ public class Main {
                     System.out.print("Ödeme Tutarı: ");
                     double payment = Double.parseDouble(scanner.nextLine());
                     checking.payCredit(payCreditId, payment);
+                    bank.saveData(); // Kredi ödemesi sonrası kaydet
                     break;
                 case "4":
                     System.out.println("\n--- TÜM KREDİLER ---");
@@ -230,6 +247,28 @@ public class Main {
             }
         } else {
             System.out.println(">> HATA: Hesap bulunamadı veya vadesiz hesap değil!");
+        }
+    }
+
+    private static void listAllAccounts() {
+        bank.listAllAccounts();
+    }
+
+    private static void deleteAccount() {
+        System.out.print("\nSilinecek Hesap No: ");
+        String accNum = scanner.nextLine();
+        
+        System.out.print("Emin misiniz? (E/H): ");
+        String confirm = scanner.nextLine();
+        
+        if (confirm.equalsIgnoreCase("E")) {
+            if (bank.deleteAccount(accNum)) {
+                System.out.println(">> Hesap başarıyla silindi.");
+            } else {
+                System.out.println(">> HATA: Hesap bulunamadı!");
+            }
+        } else {
+            System.out.println(">> İşlem iptal edildi.");
         }
     }
 }

@@ -1,7 +1,9 @@
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Account implements ITransferable {
+public abstract class Account implements ITransferable, Serializable {
+    private static final long serialVersionUID = 1L;
     protected String accountNumber;
     protected double balance;
     private List<Transaction> transactionHistory;

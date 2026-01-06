@@ -1,4 +1,7 @@
-public class Credit {
+import java.io.Serializable;
+
+public class Credit implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String creditId;
     private String accountNumber;
     private double amount;
